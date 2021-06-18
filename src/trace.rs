@@ -204,7 +204,7 @@ mod impls {
         }
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(not(feature = "no_std"))]
     mod collections {
         pub use super::*;
         use std::collections;
@@ -278,7 +278,7 @@ mod impls {
         }
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(not(feature = "no_std"))]
     mod ffi {
         pub use super::*;
         use std::ffi;
@@ -304,7 +304,7 @@ mod impls {
         }
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(not(feature = "no_std"))]
     mod io {
         pub use super::*;
         use std::io;
@@ -370,7 +370,7 @@ mod impls {
         }
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(not(feature = "no_std"))]
     mod net {
         pub use super::*;
         use std::net;
@@ -420,7 +420,7 @@ mod impls {
         }
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(not(feature = "no_std"))]
     mod path {
         pub use super::*;
         use std::path;
@@ -434,7 +434,7 @@ mod impls {
         }
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(not(feature = "no_std"))]
     mod process {
         pub use super::*;
         use std::process;
@@ -500,41 +500,41 @@ mod impls {
 
     mod sync {
         pub use super::*;
-        #[cfg(not(feature = "std"))]
+        #[cfg(feature = "no_std")]
         use alloc::sync;
-        #[cfg(feature = "std")]
+        #[cfg(not(feature = "no_std"))]
         use std::sync;
 
         impl<T> Trace for sync::Arc<T> {
             fn trace(&self, _tracer: &mut Tracer) { }
         }
 
-        #[cfg(feature = "std")]
+        #[cfg(not(feature = "no_std"))]
         impl Trace for sync::Barrier {
             fn trace(&self, _tracer: &mut Tracer) { }
         }
 
-        #[cfg(feature = "std")]
+        #[cfg(not(feature = "no_std"))]
         impl Trace for sync::Condvar {
             fn trace(&self, _tracer: &mut Tracer) { }
         }
 
-        #[cfg(feature = "std")]
+        #[cfg(not(feature = "no_std"))]
         impl<T> Trace for sync::Mutex<T> {
             fn trace(&self, _tracer: &mut Tracer) { }
         }
 
-        #[cfg(feature = "std")]
+        #[cfg(not(feature = "no_std"))]
         impl Trace for sync::Once {
             fn trace(&self, _tracer: &mut Tracer) { }
         }
 
-        #[cfg(feature = "std")]
+        #[cfg(not(feature = "no_std"))]
         impl<T> Trace for sync::PoisonError<T> {
             fn trace(&self, _tracer: &mut Tracer) { }
         }
 
-        #[cfg(feature = "std")]
+        #[cfg(not(feature = "no_std"))]
         impl<T: Trace> Trace for sync::RwLock<T> {
             fn trace(&self, tracer: &mut Tracer) {
                 if let Ok(v) = self.write() {
@@ -544,7 +544,7 @@ mod impls {
         }
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(not(feature = "no_std"))]
     mod thread {
         pub use super::*;
         use std::thread;

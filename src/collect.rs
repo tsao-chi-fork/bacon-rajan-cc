@@ -9,11 +9,22 @@
 
 use core::ptr::NonNull;
 use core::cell::RefCell;
+use alloc::vec::Vec;
+use alloc::vec;
 
 use cc_box_ptr::{CcBoxPtr, free};
 use super::Color;
 
+#[cfg(not(feature = "no_std"))]
+use std::thread_local;
+#[cfg(not(feature = "no_std"))]
 thread_local!(static ROOTS: RefCell<Vec<NonNull<dyn CcBoxPtr>>> = RefCell::new(vec![]));
+#[cfg(feature = "no_std")]
+use static_init::dynamic;
+#[cfg(feature = "no_std")]
+#[dynamic(drop)]
+#[thread_local]
+static ROOTS: RefCell<Vec<NonNull<dyn CcBoxPtr>>> = RefCell::new(vec![]);
 
 #[doc(hidden)]
 pub fn add_root(box_ptr: NonNull<dyn CcBoxPtr>) {

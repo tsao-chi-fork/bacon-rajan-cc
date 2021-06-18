@@ -166,10 +166,11 @@
 
 #![no_std]
 #![deny(missing_docs)]
+#![feature(thread_local)]
 
 extern crate alloc;
 
-#[cfg(feature = "std")]
+#[cfg(not(feature = "no_std"))]
 extern crate std;
 
 use core::cell::Cell;
@@ -1151,7 +1152,7 @@ mod tests {
         assert_eq!(format!("{:?}", foo), "75");
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(not(feature = "no_std"))]
     #[cfg(not(all(target_os = "macos", miri)))]
     #[test]
     fn test_map() {

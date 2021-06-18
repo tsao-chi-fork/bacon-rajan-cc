@@ -18,7 +18,8 @@ keywords=["cc", "gc", "mark", "sweep", "garbage"]
 name = "bacon_rajan_cc"
 
 [dependencies]
+static_init = { version = "1.0.1", optional = true, features = ["thread_local"] }
 
 [features]
-default = ["std"]
-std = []
+default = ["no_std"]
+no_std = ["static_init"]
