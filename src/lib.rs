@@ -164,9 +164,14 @@
 //! }
 //! ```
 
+#![no_std]
 #![deny(missing_docs)]
 
-extern crate core;
+extern crate alloc;
+
+#[cfg(feature = "std")]
+extern crate std;
+
 use core::cell::Cell;
 use core::clone::Clone;
 use core::cmp::{PartialEq, PartialOrd, Eq, Ord, Ordering};
@@ -174,7 +179,7 @@ use core::default::Default;
 use core::fmt;
 use core::hash::{Hasher, Hash};
 use core::mem::forget;
-use std::ptr::NonNull;
+use core::ptr::NonNull;
 use core::ops::{Deref, Drop};
 use core::option::Option;
 use core::option::Option::{Some, None};
@@ -182,7 +187,7 @@ use core::ptr;
 use core::result::Result;
 use core::result::Result::{Ok, Err};
 
-use std::alloc::{dealloc, Layout};
+use alloc::alloc::{dealloc, Layout};
 
 /// Tracing traits, types, and implementation.
 pub mod trace;
@@ -260,7 +265,7 @@ impl<T: Trace> Cc<T> {
                 // pointers, which ensures that the weak destructor never frees
                 // the allocation while the strong destructor is running, even
                 // if the weak pointer is stored inside the strong one.
-                _ptr: NonNull::new_unchecked(Box::into_raw(Box::new(CcBox {
+                _ptr: NonNull::new_unchecked(alloc::boxed::Box::into_raw(alloc::boxed::Box::new(CcBox {
                     value: value,
                     data: CcBoxData {
                         strong: Cell::new(1),
@@ -895,15 +900,18 @@ pub(crate) unsafe fn drop_value(ptr: NonNull<dyn CcBoxPtr>) {
 
 #[cfg(test)]
 mod tests {
+    extern crate std;
     use super::{Cc, Weak, Trace, Tracer};
-    use std::boxed::Box;
-    use std::cell::RefCell;
-    use std::option::Option;
-    use std::option::Option::{Some, None};
-    use std::result::Result::{Err, Ok};
-    use std::mem::drop;
-    use std::clone::Clone;
+    use self::std::boxed::Box;
+    use self::std::cell::RefCell;
+    use self::std::option::Option;
+    use self::std::option::Option::{Some, None};
+    use self::std::result::Result::{Err, Ok};
+    use self::std::mem::drop;
+    use self::std::clone::Clone;
     use collect::collect_cycles;
+    use self::std::prelude::v1::*;
+    use self::std::{vec, format};
 
     // Tests copied from `Rc<T>`.
 
@@ -1143,6 +1151,7 @@ mod tests {
         assert_eq!(format!("{:?}", foo), "75");
     }
 
+    #[cfg(feature = "std")]
     #[cfg(not(all(target_os = "macos", miri)))]
     #[test]
     fn test_map() {
@@ -1156,7 +1165,7 @@ mod tests {
 
     #[test]
     fn list_cycle() {
-        use std::cell::RefCell;
+        use core::cell::RefCell;
 
         struct List(Vec<Cc<RefCell<List>>>);
         impl Trace for List {

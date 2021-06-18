@@ -7,8 +7,8 @@
 // or http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use std::ptr::NonNull;
-use std::cell::RefCell;
+use core::ptr::NonNull;
+use core::cell::RefCell;
 
 use cc_box_ptr::{CcBoxPtr, free};
 use super::Color;
@@ -207,13 +207,13 @@ fn mark_roots() {
         });
     }
 
-    let old_roots: Vec<_> = ROOTS.with(|r| {
+    let old_roots: alloc::vec::Vec<_> = ROOTS.with(|r| {
         let mut v = r.borrow_mut();
         let drained = v.drain(..);
         drained.collect()
     });
 
-    let mut new_roots : Vec<_> = old_roots.into_iter().filter_map(|s| {
+    let mut new_roots : alloc::vec::Vec<_> = old_roots.into_iter().filter_map(|s| {
         let keep = unsafe {
             let box_ptr : &dyn CcBoxPtr = s.as_ref();
             if box_ptr.color() == Color::Purple {
@@ -291,9 +291,9 @@ fn collect_roots() {
     // Bacon-Rajan paper. We need this because we have destructors and
     // running them during traversal will cause cycles to be broken which
     // ruins the rest of our traversal.
-    let mut white = Vec::new();
+    let mut white = alloc::vec::Vec::new();
 
-    fn collect_white(s: &(dyn CcBoxPtr + 'static), white: &mut Vec<NonNull<dyn CcBoxPtr>>) {
+    fn collect_white(s: &(dyn CcBoxPtr + 'static), white: &mut alloc::vec::Vec<NonNull<dyn CcBoxPtr>>) {
         if s.color() == Color::White && !s.buffered() {
             s.data().color.set(Color::Black);
             s.trace(&mut |t| {

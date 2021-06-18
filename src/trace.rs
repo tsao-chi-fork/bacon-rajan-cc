@@ -178,7 +178,7 @@ mod impls {
     mod boxed {
         pub use super::*;
 
-        impl<T: Trace + ?Sized> Trace for Box<T> {
+        impl<T: Trace + ?Sized> Trace for alloc::boxed::Box<T> {
             fn trace(&self, tracer: &mut Tracer) {
                 (**self).trace(tracer);
             }
@@ -187,7 +187,7 @@ mod impls {
 
     mod cell {
         pub use super::*;
-        use std::cell;
+        use core::cell;
 
         impl<T: Copy + Trace + ?Sized> Trace for cell::Cell<T> {
             fn trace(&self, tracer: &mut Tracer) {
@@ -204,6 +204,7 @@ mod impls {
         }
     }
 
+    #[cfg(feature = "std")]
     mod collections {
         pub use super::*;
         use std::collections;
@@ -261,7 +262,7 @@ mod impls {
 
     mod vec {
         pub use super::*;
-        impl<T: Trace> Trace for Vec<T> {
+        impl<T: Trace> Trace for alloc::vec::Vec<T> {
             fn trace(&self, tracer: &mut Tracer) {
                 for t in self {
                     t.trace(tracer);
@@ -272,11 +273,12 @@ mod impls {
 
     mod string {
         pub use super::*;
-        impl Trace for String {
+        impl Trace for alloc::string::String {
             fn trace(&self, _tracer: &mut Tracer) { }
         }
     }
 
+    #[cfg(feature = "std")]
     mod ffi {
         pub use super::*;
         use std::ffi;
@@ -302,6 +304,7 @@ mod impls {
         }
     }
 
+    #[cfg(feature = "std")]
     mod io {
         pub use super::*;
         use std::io;
@@ -367,6 +370,7 @@ mod impls {
         }
     }
 
+    #[cfg(feature = "std")]
     mod net {
         pub use super::*;
         use std::net;
@@ -416,6 +420,7 @@ mod impls {
         }
     }
 
+    #[cfg(feature = "std")]
     mod path {
         pub use super::*;
         use std::path;
@@ -429,6 +434,7 @@ mod impls {
         }
     }
 
+    #[cfg(feature = "std")]
     mod process {
         pub use super::*;
         use std::process;
@@ -468,7 +474,7 @@ mod impls {
 
     mod rc {
         pub use super::*;
-        use std::rc;
+        use alloc::rc;
 
         impl<T> Trace for rc::Rc<T> {
             fn trace(&self, _tracer: &mut Tracer) { }
@@ -494,32 +500,41 @@ mod impls {
 
     mod sync {
         pub use super::*;
+        #[cfg(not(feature = "std"))]
+        use alloc::sync;
+        #[cfg(feature = "std")]
         use std::sync;
 
         impl<T> Trace for sync::Arc<T> {
             fn trace(&self, _tracer: &mut Tracer) { }
         }
 
+        #[cfg(feature = "std")]
         impl Trace for sync::Barrier {
             fn trace(&self, _tracer: &mut Tracer) { }
         }
 
+        #[cfg(feature = "std")]
         impl Trace for sync::Condvar {
             fn trace(&self, _tracer: &mut Tracer) { }
         }
 
+        #[cfg(feature = "std")]
         impl<T> Trace for sync::Mutex<T> {
             fn trace(&self, _tracer: &mut Tracer) { }
         }
 
+        #[cfg(feature = "std")]
         impl Trace for sync::Once {
             fn trace(&self, _tracer: &mut Tracer) { }
         }
 
+        #[cfg(feature = "std")]
         impl<T> Trace for sync::PoisonError<T> {
             fn trace(&self, _tracer: &mut Tracer) { }
         }
 
+        #[cfg(feature = "std")]
         impl<T: Trace> Trace for sync::RwLock<T> {
             fn trace(&self, tracer: &mut Tracer) {
                 if let Ok(v) = self.write() {
@@ -529,6 +544,7 @@ mod impls {
         }
     }
 
+    #[cfg(feature = "std")]
     mod thread {
         pub use super::*;
         use std::thread;
